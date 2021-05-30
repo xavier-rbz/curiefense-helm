@@ -11,6 +11,7 @@ metadata:
     istio.io/rev: {{ .Values.revision | default "default" }}
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "EgressGateways"
+    app.kubernetes.io/part-of: curiefense
 spec:
   minAvailable: 1
   selector:

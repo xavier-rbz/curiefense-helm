@@ -4,6 +4,9 @@ metadata:
   name: curielogger
   namespace: {{ .Release.Namespace }}
   labels:
+    app.kubernetes.io/name: curielogger
+    app.kubernetes.io/part-of: curiefense
+  labels:
     app: curielogger
 spec:
   host: curielogger.{{ .Release.Namespace }}.svc.cluster.local

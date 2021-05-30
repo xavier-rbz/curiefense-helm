@@ -9,6 +9,7 @@ spec:
   workloadSelector:
     labels:
       curiefense: "enabled"
+      app.kubernetes.io/part-of: curiefense
   configPatches:
   - applyTo: HTTP_FILTER
     match:

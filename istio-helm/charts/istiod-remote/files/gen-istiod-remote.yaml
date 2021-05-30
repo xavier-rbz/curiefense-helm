@@ -10,6 +10,7 @@ metadata:
     install.operator.istio.io/owning-resource: unknown
     operator.istio.io/component: "Pilot"
     release: istiod-remote
+    app.kubernetes.io/part-of: curiefense
 data:
 
   # Configuration file for the mesh networks to be used by the Split Horizon EDS.
@@ -37,6 +38,7 @@ metadata:
     install.operator.istio.io/owning-resource: unknown
     operator.istio.io/component: "Pilot"
     release: istiod-remote
+    app.kubernetes.io/part-of: curiefense
 data:
 
   values: |-
@@ -921,6 +923,7 @@ metadata:
     operator.istio.io/component: "Pilot"
     app: sidecar-injector
     release: istiod-remote
+    app.kubernetes.io/part-of: curiefense
 webhooks:
 - name: sidecar-injector.istio.io
   clientConfig:

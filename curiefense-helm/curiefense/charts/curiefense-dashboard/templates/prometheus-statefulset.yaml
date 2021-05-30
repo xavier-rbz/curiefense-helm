@@ -5,6 +5,7 @@ kind: StatefulSet
 metadata:
   labels:
     app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: curiefense
   name: prometheus
   namespace: {{ .Release.Namespace }}
 spec:

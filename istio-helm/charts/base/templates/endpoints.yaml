@@ -4,6 +4,8 @@ apiVersion: v1
 kind: Endpoints
 metadata:
   name: istiod-remote
+  labels:
+    app.kubernetes.io/part-of: curiefense
   namespace: {{ .Release.Namespace }}
 subsets:
 - addresses:

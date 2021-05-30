@@ -10,6 +10,7 @@ metadata:
     operator.istio.io/component: "Pilot"
     istio: pilot
     release: {{ .Release.Name }}
+    app.kubernetes.io/part-of: curiefense
 {{- range $key, $val := .Values.pilot.deploymentLabels }}
     {{ $key }}: "{{ $val }}"
 {{- end }}

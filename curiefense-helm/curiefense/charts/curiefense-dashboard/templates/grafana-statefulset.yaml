@@ -5,6 +5,7 @@ kind: StatefulSet
 metadata:
   labels:
     app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: curiefense
   name: grafana
   namespace: {{ .Release.Namespace }}
 spec:

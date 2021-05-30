@@ -13,6 +13,7 @@ metadata:
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "IngressGateways"
     curiefense: {{ (ternary "enabled" "disabled" $gateway.waf.enabled) }}
+    app.kubernetes.io/part-of: curiefense
 spec:
 {{- if not $gateway.autoscaleEnabled }}
 {{- if $gateway.replicaCount }}

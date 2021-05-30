@@ -9,6 +9,7 @@ spec:
   workloadSelector:
     labels:
       curiefense: "enabled"
+      app.kubernetes.io/part-of: curiefense
   configPatches:
   - applyTo: NETWORK_FILTER # http connection manager is a filter in Envoy
     match:
