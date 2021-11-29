@@ -21,15 +21,17 @@ spec:
     spec:
       containers:
       - name: uiserver
-      {{ if regexMatch ".*/.*:" .Values.global.images.uiserver }}
-      {{/* The image name contains a version tag (e.g. for tests), do not append docker_tag */}}
-        image: {{ .Values.global.images.uiserver }}
-      {{ else }}
-        image: {{ .Values.global.images.uiserver }}:{{ .Values.global.settings.docker_tag }}
-      {{ end }}
+        image: curiefense/uiserver:tls-confserver
         ports:
         - containerPort: 80
           name: uiserver-http
+        volumeMounts:
+        - mountPath: /run/secrets/confsslcrt
+          name: confsslcrt
+        - mountPath: /run/secrets/uisslcrt
+          name: uisslcrt
+        - mountPath: /run/secrets/uisslkey
+          name: uisslkey
         livenessProbe:
           httpGet:
             path: /
@@ -46,6 +48,25 @@ spec:
       imagePullSecrets:
         {{- .Values.global.imagePullSecrets | toYaml | nindent 8  }}
       serviceAccountName: ""
+      volumes:
+      - name: confsslcrt
+        secret:
+          items:
+          - key: confsslcrt
+            path: confsslcrt
+          secretName: confsslcrt
+      - name: uisslcrt
+        secret:
+          items:
+          - key: uisslcrt
+            path: uisslcrt
+          secretName: uisslcrt
+      - name: uisslkey
+        secret:
+          items:
+          - key: uisslkey
+            path: uisslkey
+          secretName: uisslkey
 {{- if .Values.global.tolerations }}
       tolerations:
 {{ toYaml .Values.global.tolerations | indent 8 }}

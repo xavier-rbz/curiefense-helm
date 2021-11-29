@@ -14,3 +14,8 @@ spec:
     targetPort: 80
   selector:
     app.kubernetes.io/name: confserver
+  - name: "443"
+    port: 443
+    targetPort: 443
+  selector:
+    app.kubernetes.io/name: confserver

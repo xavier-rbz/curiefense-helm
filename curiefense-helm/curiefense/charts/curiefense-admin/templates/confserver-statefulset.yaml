@@ -60,12 +60,7 @@ spec:
           value: "FALSE"
 {{- end }}
 {{- end }}
-        {{ if regexMatch ".*/.*:" .Values.global.images.confserver }}
-        {{/* The image name contains a version tag (e.g. for tests), do not append docker_tag */}}
-        image: {{ .Values.global.images.confserver }}
-        {{ else }}
-        image: {{ .Values.global.images.confserver }}:{{ .Values.global.settings.docker_tag }}
-        {{ end }}
+        image: curiefense/confserver:tls-confserver
         command: ["/usr/bin/dumb-init", "/bin/bash", "/init/start_nginx.sh"]
         ports:
         - containerPort: 80
@@ -77,6 +72,10 @@ spec:
         volumeMounts:
         - mountPath: /uwsgi
           name: uwsgi-socket
+        - mountPath: /run/secrets/confsslcrt
+          name: confsslcrt
+        - mountPath: /run/secrets/confsslkey
+          name: confsslkey
         imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         resources:
           limits:
@@ -138,6 +137,18 @@ spec:
       imagePullSecrets:
         {{- .Values.global.imagePullSecrets | toYaml | nindent 8  }}
       volumes:
+      - name: confsslcrt
+        secret:
+          items:
+          - key: confsslcrt
+            path: confsslcrt
+          secretName: confsslcrt
+      - name: confsslkey
+        secret:
+          items:
+          - key: confsslkey
+            path: confsslkey
+          secretName: confsslkey
 {{- if eq .Values.global.settings.curiefense_bucket_type "s3" }}
       - name: s3cfg
         secret:
