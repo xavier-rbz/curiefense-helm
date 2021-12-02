@@ -55,6 +55,8 @@ global:
     uiserver_enable_tls: false
     uiserver_domain: ""
     uiserver_annotations: {}
+    # Set the admin password for the supplied grafana instance (not designed for production)
+    grafana_admin_password: 'admin'
 
   requests:
     cpu:

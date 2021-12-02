@@ -32,6 +32,9 @@ spec:
         {{ end }}
         securityContext:
           runAsUser: 0
+        env:
+          - name: "GF_SECURITY_ADMIN_PASSWORD"
+            value: "{{ .Values.global.settings.grafana_admin_password }}"
         ports:
         - containerPort: 3000
           name: grafana-http
