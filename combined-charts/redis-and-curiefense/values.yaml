@@ -1,0 +1,11 @@
+# Default values for redis-and-curiefense.
+
+redis:
+  image:
+    tag: "main"
+
+curiefense:
+  global:
+    settings:
+      # docker_tag will be overridden by deploy.sh
+      docker_tag: "main"

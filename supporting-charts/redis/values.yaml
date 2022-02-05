@@ -1,0 +1,30 @@
+replicaCount: 1
+
+image:
+  repository: curiefense/redis
+  pullPolicy: IfNotPresent
+  # will be overridden
+  tag: "main"
+
+settings:
+  port: "6379"
+
+storage:
+  size: "1Gi"
+  class: null
+
+imagePullSecrets: []
+
+resources:
+  limits:
+    cpu: "900m"
+    memory: "1Gi"
+  requests:
+    cpu: "10m"
+    memory: "20Mi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

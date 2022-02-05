@@ -9,7 +9,7 @@ metadata:
 spec:
   ports:
   - name: "redis-tcp"
-    port: {{ .Values.global.settings.redis_port }}
+    port: {{ .Values.settings.port }}
     targetPort: 6379
   selector:
     app.kubernetes.io/name: redis
