@@ -31,7 +31,7 @@ if ! helm upgrade istio-ingress charts/gateways/istio-ingress \
     -f charts/enable-waf-ingress.yaml \
     "${PARAMS[@]}" \
     --wait --timeout 600s \
-    --set "global.proxy.gw_image=curiefense/curieproxy-istio:$DOCKER_TAG" \
+    --set "global.proxy.extproc_image=curiefense/extproc:$DOCKER_TAG" \
     --set "global.proxy.curiesync_image=curiefense/curiesync:$DOCKER_TAG" "$@"
 then
     echo "istio deployment failure... "

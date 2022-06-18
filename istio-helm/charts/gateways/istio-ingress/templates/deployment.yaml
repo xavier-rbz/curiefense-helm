@@ -195,20 +195,31 @@ spec:
 {{- end }}
           - mountPath: /cf-config
             name: curiefense-config
+        - name: extproc
+{{- if contains "/" $.Values.global.proxy.extproc_image }}
+          image: "{{ $.Values.global.proxy.extproc_image }}"
+{{- else }}
+          image: "{{ $.Values.global.hub }}/{{ $.Values.global.proxy.extproc_image }}:{{ $.Values.global.tag }}"
+{{- end }}
+          imagePullPolicy: {{ $.Values.global.imagePullPolicy }}
+          resources:
+{{- if $gateway.resources }}
+{{ toYaml $gateway.resources | indent 12 }}
+{{- else }}
+{{ toYaml .Values.global.defaultResources | indent 12 }}
+{{- end }}
+          env:
+            - name: EXTPROC_LOG_LEVEL
+              value: "info"
+          volumeMounts:
+          - name: curiefense-config
+            mountPath: /cf-config
 {{- end }}
         - name: istio-proxy
-{{- if $gateway.waf.enabled }}
-{{- if contains "/" $.Values.global.proxy.gw_image }}
-          image: "{{ $.Values.global.proxy.gw_image }}"
-{{- else }}
-          image: "{{ $.Values.global.hub }}/{{ $.Values.global.proxy.gw_image }}:{{ $.Values.global.tag }}"
-{{- end }}
-{{- else }}
 {{- if contains "/" .Values.global.proxy.image }}
           image: "{{ .Values.global.proxy.image }}"
 {{- else }}
           image: "{{ .Values.global.hub }}/{{ .Values.global.proxy.image | default "proxyv2" }}:{{ .Values.global.tag }}"
-{{- end }}
 {{- end }}
 {{- if .Values.global.imagePullPolicy }}
           imagePullPolicy: {{ .Values.global.imagePullPolicy }}
@@ -349,11 +360,6 @@ spec:
           {{- end }}
           - name: ISTIO_META_CLUSTER_ID
             value: "{{ $.Values.global.multiCluster.clusterName | default `Kubernetes` }}"
-          volumeMounts:
-          {{- if $gateway.waf.enabled }}
-          - name: curiefense-config
-            mountPath: /cf-config
-          {{- end }}
           - name: istio-envoy
             mountPath: /etc/istio/proxy
           - name: config-volume
