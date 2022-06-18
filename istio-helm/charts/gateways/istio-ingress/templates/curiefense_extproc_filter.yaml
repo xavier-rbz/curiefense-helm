@@ -1,0 +1,42 @@
+{{- $gateway := index .Values "gateways" "istio-ingressgateway" }}
+{{- if $gateway.waf.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: curiefense-extproc-filter
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/part-of: "curiefense"
+spec:
+  workloadSelector:
+    labels:
+      curiefense: "enabled"
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+    patch:
+      operation: INSERT_BEFORE
+      value: # extproc filter specification
+        name: envoy.filters.http.ext_proc
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor
+          failure_mode_allow: false
+          async_mode: false
+          message_timeout: 25s
+          request_attributes:
+            - user
+          response_attributes:
+            - server
+          processing_mode:
+            request_header_mode: "SEND"
+            response_header_mode: "SEND"
+            request_body_mode: "STREAMED"
+            response_body_mode: "NONE"
+            request_trailer_mode: "SKIP"
+            response_trailer_mode: "SKIP"
+          grpc_service:
+            google_grpc:
+              target_uri: "localhost:50051"
+              stat_prefix: "cf_extproc"
+{{- end }}
