@@ -5,7 +5,6 @@ metadata:
     service.istio.io/canonical-name: {{ index .ObjectMeta.Labels `service.istio.io/canonical-name` | default (index .ObjectMeta.Labels `app.kubernetes.io/name`) | default (index .ObjectMeta.Labels `app`) | default .DeploymentMeta.Name  | quote }}
     service.istio.io/canonical-revision: {{ index .ObjectMeta.Labels `service.istio.io/canonical-revision` | default (index .ObjectMeta.Labels `app.kubernetes.io/version`) | default (index .ObjectMeta.Labels `version`) | default "latest"  | quote }}
     istio.io/rev: {{ .Revision | default "default" | quote }}
-    app.kubernetes.io/part-of: "curiefense"
   annotations: {
     {{- if eq (len $containers) 1 }}
     kubectl.kubernetes.io/default-logs-container: "{{ index $containers 0 }}",
@@ -132,10 +131,17 @@ spec:
       timeoutSeconds: 3
       failureThreshold: {{ .Values.global.proxy.readinessFailureThreshold }}
     volumeMounts:
+    - name: workload-socket
+      mountPath: /var/run/secrets/workload-spiffe-uds
+    - name: credential-socket
+      mountPath: /var/run/secrets/credential-uds
     {{- if eq .Values.global.caName "GkeWorkloadCertificate" }}
     - name: gke-workload-certificate
       mountPath: /var/run/secrets/workload-spiffe-credentials
       readOnly: true
+    {{- else }}
+    - name: workload-certs
+      mountPath: /var/run/secrets/workload-spiffe-credentials
     {{- end }}
     {{- if eq .Values.global.pilotCertProvider "istiod" }}
     - mountPath: /var/run/secrets/istio
@@ -159,10 +165,17 @@ spec:
     - name: istio-podinfo
       mountPath: /etc/istio/pod
   volumes:
+  - emptyDir: {}
+    name: workload-socket
+  - emptyDir: {}
+    name: credential-socket
   {{- if eq .Values.global.caName "GkeWorkloadCertificate" }}
   - name: gke-workload-certificate
     csi:
       driver: workloadcertificates.security.cloud.google.com
+  {{- else}}
+  - emptyDir: {}
+    name: workload-certs
   {{- end }}
   # SDS channel between istioagent and Envoy
   - emptyDir:
@@ -210,7 +223,7 @@ spec:
     - name: {{ . }}
     {{- end }}
   {{- end }}
-  {{- if eq (env "ENABLE_LEGACY_FSGROUP_INJECTION" "true") "true" }}
+  {{- if eq (env "ENABLE_LEGACY_FSGROUP_INJECTION" "false") "true" }}
   securityContext:
     fsGroup: 1337
   {{- end }}

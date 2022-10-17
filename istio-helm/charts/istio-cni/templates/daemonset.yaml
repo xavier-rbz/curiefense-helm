@@ -12,7 +12,6 @@ metadata:
     istio.io/rev: {{ .Values.revision | default "default" }}
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "Cni"
-    app.kubernetes.io/part-of: "curiefense"
 spec:
   selector:
     matchLabels:
@@ -26,13 +25,7 @@ spec:
       labels:
         k8s-app: istio-cni-node
         sidecar.istio.io/inject: "false"
-        app.kubernetes.io/part-of: "curiefense"
       annotations:
-        # This, along with the CriticalAddonsOnly toleration below,
-        # marks the pod as a critical add-on, ensuring it gets
-        # priority scheduling and that its resources are reserved
-        # if it ever gets evicted.
-        scheduler.alpha.kubernetes.io/critical-pod: ''
         sidecar.istio.io/inject: "false"
         # Add Prometheus Scrape annotations
         prometheus.io/scrape: 'true'
@@ -71,11 +64,6 @@ spec:
 {{- if or .Values.cni.pullPolicy .Values.global.imagePullPolicy }}
           imagePullPolicy: {{ .Values.cni.pullPolicy | default .Values.global.imagePullPolicy }}
 {{- end }}
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8000
-            initialDelaySeconds: 5
           readinessProbe:
             httpGet:
               path: /readyz
@@ -86,6 +74,10 @@ spec:
             runAsNonRoot: false
             privileged: {{ .Values.cni.privileged }}
           command: ["install-cni"]
+          args:
+            {{- if .Values.global.logging.level }}
+            - --log_output_level={{ .Values.global.logging.level }}
+            {{- end}}
           env:
 {{- if .Values.cni.cniConfFileName }}
             # Name of the CNI config file to create.

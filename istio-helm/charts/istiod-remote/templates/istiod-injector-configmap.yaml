@@ -9,7 +9,6 @@ metadata:
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "Pilot"
     release: {{ .Release.Name }}
-    app.kubernetes.io/part-of: "curiefense"
 data:
 {{/* Scope the values to just top level fields used in the template, to reduce the size. */}}
   values: |-
@@ -37,7 +36,7 @@ data:
 {{ toYaml .Values.sidecarInjectorWebhook.neverInjectSelector | trim | indent 6 }}
     injectedAnnotations:
       {{- range $key, $val := .Values.sidecarInjectorWebhook.injectedAnnotations }}
-      "{{ $key }}": "{{ $val }}"
+      "{{ $key }}": {{ $val | quote }}
       {{- end }}
     {{- /* If someone ends up with this new template, but an older Istiod image, they will attempt to render this template
          which will fail with "Pod injection failed: template: inject:1: function "Istio_1_9_Required_Template_And_Version_Mismatched" not defined".

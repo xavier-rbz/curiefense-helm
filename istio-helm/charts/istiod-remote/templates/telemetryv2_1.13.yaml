@@ -13,8 +13,8 @@ metadata:
   {{- end }}
   labels:
     istio.io/rev: {{ .Values.revision | default "default" }}
-    app.kubernetes.io/part-of: "curiefense"
 spec:
+  priority: -1
   configPatches:
     - applyTo: HTTP_FILTER
       match:
@@ -90,15 +90,7 @@ spec:
                     {
                       "debug": "false",
                       "stat_prefix": "istio",
-                      "disable_host_header_fallback": true,
-                      "metrics": [
-                        {
-                          "dimensions": {
-                            "destination_cluster": "node.metadata['CLUSTER_ID']",
-                            "source_cluster": "downstream_peer.cluster_id"
-                          }
-                        }
-                      ]
+                      "disable_host_header_fallback": true
                     }
                     {{- else }}
                     {{ toJson .Values.telemetry.v2.prometheus.configOverride.inboundSidecar | indent 18 }}
@@ -177,8 +169,8 @@ metadata:
   {{- end }}
   labels:
     istio.io/rev: {{ .Values.revision | default "default" }}
-    app.kubernetes.io/part-of: "curiefense"
 spec:
+  priority: -1
   configPatches:
     - applyTo: NETWORK_FILTER
       match:
@@ -205,15 +197,7 @@ spec:
                     {{- if not .Values.telemetry.v2.prometheus.configOverride.inboundSidecar }}
                     {
                       "debug": "false",
-                      "stat_prefix": "istio",
-                      "metrics": [
-                        {
-                          "dimensions": {
-                            "destination_cluster": "node.metadata['CLUSTER_ID']",
-                            "source_cluster": "downstream_peer.cluster_id"
-                          }
-                        }
-                      ]
+                      "stat_prefix": "istio"
                     }
                     {{- else }}
                     {{ toJson .Values.telemetry.v2.prometheus.configOverride.inboundSidecar | indent 18 }}
@@ -334,8 +318,8 @@ metadata:
   {{- end }}
   labels:
     istio.io/rev: {{ .Values.revision | default "default" }}
-    app.kubernetes.io/part-of: "curiefense"
 spec:
+  priority: -1
   configPatches:
 {{- if not .Values.telemetry.v2.stackdriver.disableOutbound }}
     - applyTo: HTTP_FILTER
@@ -465,8 +449,8 @@ metadata:
   {{- end }}
   labels:
     istio.io/rev: {{ .Values.revision | default "default" }}
-    app.kubernetes.io/part-of: "curiefense"
 spec:
+  priority: -1
   configPatches:
   {{- if not .Values.telemetry.v2.stackdriver.disableOutbound }}
   - applyTo: NETWORK_FILTER
@@ -589,8 +573,8 @@ metadata:
   {{- end }}
   labels:
     istio.io/rev: {{ .Values.revision | default "default" }}
-    app.kubernetes.io/part-of: "curiefense"
 spec:
+  priority: -1
   configPatches:
     - applyTo: HTTP_FILTER
       match:
