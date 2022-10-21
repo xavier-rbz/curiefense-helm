@@ -8,7 +8,6 @@ metadata:
     istio.io/rev: {{ .Values.revision | default "default" }}
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "Cni"
-    app.kubernetes.io/part-of: "curiefense"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -28,7 +27,6 @@ metadata:
     istio.io/rev: {{ .Values.revision | default "default" }}
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "Cni"
-    app.kubernetes.io/part-of: "curiefense"
 subjects:
 - kind: ServiceAccount
   name: istio-cni
@@ -49,7 +47,6 @@ metadata:
     istio.io/rev: {{ .Values.revision | default "default" }}
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "Cni"
-    app.kubernetes.io/part-of: "curiefense"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -70,7 +67,6 @@ metadata:
     istio.io/rev: {{ .Values.revision | default "default" }}
     install.operator.istio.io/owning-resource: {{ .Values.ownerName | default "unknown" }}
     operator.istio.io/component: "Cni"
-    app.kubernetes.io/part-of: "curiefense"
 subjects:
   - kind: ServiceAccount
     name: istio-cni

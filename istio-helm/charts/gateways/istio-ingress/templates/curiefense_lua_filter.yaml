@@ -5,8 +5,6 @@ kind: EnvoyFilter
 metadata:
   name: curiefense-lua-filter
   namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/part-of: "curiefense"
 spec:
   workloadSelector:
     labels:
@@ -25,5 +23,8 @@ spec:
             local session = require "lua.session_envoy"
             function envoy_on_request(handle)
               session.inspect(handle)
+            end
+            function envoy_on_response(handle)
+              session.on_response(handle)
             end
 {{- end }}

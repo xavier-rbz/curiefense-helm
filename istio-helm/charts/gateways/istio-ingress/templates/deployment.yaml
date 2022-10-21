@@ -354,6 +354,12 @@ spec:
           - name: curiefense-config
             mountPath: /cf-config
           {{- end }}
+          - name: workload-socket
+            mountPath: /var/run/secrets/workload-spiffe-uds
+          - name: credential-socket
+            mountPath: /var/run/secrets/credential-uds
+          - name: workload-certs
+            mountPath: /var/run/secrets/workload-spiffe-credentials
           - name: istio-envoy
             mountPath: /etc/istio/proxy
           - name: config-volume
@@ -393,6 +399,12 @@ spec:
 {{ toYaml $gateway.additionalContainers | indent 8 }}
 {{- end }}
       volumes:
+      - emptyDir: {}
+        name: workload-socket
+      - emptyDir: {}
+        name: credential-socket
+      - emptyDir: {}
+        name: workload-certs
 {{- if $gateway.waf.enabled }}
 {{- if eq $.Values.global.proxy.curiefense_bucket_type "s3" }}
       - name: s3cfg
