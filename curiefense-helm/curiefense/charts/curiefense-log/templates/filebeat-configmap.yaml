@@ -40,11 +40,10 @@ data:
       enabled: true
       overwrite: true
       type: "index"
-      #name: "curieaccesslog"
-      #pattern: "curieaccesslog-*"
       json.enabled: true
       json.path: "/usr/share/filebeat/template.json"
       json.name: "curieaccesslog"
+      json.ignore_decoding_error: true
 
   {{- (.Files.Glob "files/**/*.json").AsConfig | nindent 2 }}
 

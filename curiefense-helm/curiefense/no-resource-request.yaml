@@ -4,7 +4,6 @@
 global:
   requests:
     cpu:
-      curielogger: "1m"
       redis: "1m"
       logstash: "1m"
       kibana: "1m"

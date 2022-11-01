@@ -2,7 +2,6 @@ global:
   imagePullPolicy: IfNotPresent
   requests:
     cpu:
-      curielogger: "1m"
       redis: "1m"
       kibana: "1m"
       uiserver: "1m"

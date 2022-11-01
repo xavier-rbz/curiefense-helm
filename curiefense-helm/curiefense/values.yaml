@@ -9,7 +9,6 @@ global:
 
   images:
     confserver: curiefense/confserver
-    curielogger: curiefense/curielogger
     redis: curiefense/redis
     uiserver: curiefense/uiserver
     grafana: curiefense/grafana
@@ -57,7 +56,6 @@ global:
 
   requests:
     cpu:
-      curielogger: "100m"
       redis: "10m"
       logstash: "100m"
       kibana: "100m"
