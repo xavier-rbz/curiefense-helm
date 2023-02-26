@@ -1,0 +1,234 @@
+image: docker.elastic.co/beats/filebeat-oss
+
+daemonset:
+  filebeatConfig:
+    ilm.json: |
+      {
+        "policy": {
+          "phases": {
+            "hot": {
+              "actions": {
+                "rollover" : {
+                  "max_age": "1d",
+                  "max_size": "50GB",
+                  "max_docs": 10000000
+                }
+              }
+            },
+            "delete": {
+              "min_age": "7d",
+              "actions": {
+                "delete": {}
+              }
+            }
+          }
+        }
+      }
+    template.json: |
+      {
+        "index_patterns": [
+          "curieaccesslog-*"
+        ],
+        "template": {
+          "settings": {},
+          "mappings": {
+            "properties": {
+              "timestamp": {
+                "type": "date_nanos"
+              },
+              "processing_stage": {
+                "type": "integer"
+              },
+              "uri": {
+                "type": "keyword"
+              },
+              "reason": {
+                "type": "text"
+              },
+              "curiesession": {
+                "type": "keyword"
+              },
+              "curiesession_ids": {
+                "type": "flattened"
+              },
+              "request_id": {
+                "type": "keyword"
+              },
+              "path": {
+                "type": "keyword"
+              },
+              "acl_triggers": {
+                "type": "nested"
+              },
+              "arguments": {
+                "type": "flattened"
+              },
+              "authority": {
+                "type": "keyword"
+              },
+              "global_filter_triggers": {
+                "type": "nested"
+              },
+              "content_filter_triggers": {
+                "type": "nested"
+              },
+              "cookies": {
+                "type": "flattened"
+              },
+              "global_filters_triggers": {
+                "type": "nested"
+              },
+              "headers": {
+                "type": "flattened"
+              },
+              "ip": {
+                "type": "ip"
+              },
+              "logs": {
+                "type": "text"
+              },
+              "method": {
+                "type": "keyword"
+              },
+              "path_parts": {
+                "type": "flattened"
+              },
+              "proxy": {
+                "type": "flattened"
+              },
+              "rate_limit_triggers": {
+                "type": "nested"
+              },
+              "requestid": {
+                "type": "keyword"
+              },
+              "security_config": {
+                "type": "object",
+                "properties": {
+                  "global_filters_active": {
+                    "type": "integer"
+                  },
+                  "rate_limit_rules": {
+                    "type": "integer"
+                  },
+                  "revision": {
+                    "type": "keyword"
+                  },
+                  "acl_active": {
+                    "type": "boolean"
+                  },
+                  "cf_active": {
+                    "type": "boolean"
+                  },
+                  "cf_rules": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "response_code": {
+                "type": "integer"
+              },
+              "tags": {
+                "type": "text"
+              },
+              "trigger_counters": {
+                "type": "object",
+                "properties": {
+                  "acl": {
+                    "type": "integer"
+                  },
+                  "acl_active": {
+                    "type": "integer"
+                  },
+                  "content_filters": {
+                    "type": "integer"
+                  },
+                  "content_filters_active": {
+                    "type": "integer"
+                  },
+                  "global_filters": {
+                    "type": "integer"
+                  },
+                  "global_filters_active": {
+                    "type": "integer"
+                  },
+                  "rate_limit": {
+                    "type": "integer"
+                  },
+                  "rate_limit_active": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    filebeat.yml: |
+      filebeat.autodiscover:
+        providers:
+          - type: kubernetes
+            templates:
+              - condition.contains:
+                  operator.istio.io/component: "IngressGateways"
+                config:
+                  - module: ingress-gateway
+                    log:
+                      input:
+                        type: docker
+                        containers.ids:
+                          - ${data.kubernetes.container.id}
+      
+      setup.dashboards:
+        enabled: false
+        directory: "curiefense"
+        index: "curieaccesslog-*"
+        retry:
+          enabled: false
+      
+      setup.ilm:
+        enabled: true
+        rollover_alias: "curieaccesslog"
+        pattern: "{now/d}-000001"
+        overwrite: true
+        policy_name: "curieaccesslog"
+        policy_file: /usr/share/filebeat/ilm.json
+      
+      setup.template:
+        enabled: true
+        overwrite: true
+        type: "index"
+        json.enabled: true
+        json.path: "/usr/share/filebeat/template.json"
+        json.name: "curieaccesslog"
+        json.ignore_decoding_error: true
+
+      filebeat.inputs:
+      - type: container
+        paths:
+          - /var/log/containers/*.log
+        processors:
+        - add_kubernetes_metadata:
+            host: ${NODE_NAME}
+            matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+      output.elasticsearch:
+        host: '${NODE_NAME}'
+        hosts: ["https://elasticsearch-master.logging:9200"]
+        username: '${ELASTICSEARCH_USERNAME}'
+        password: '${ELASTICSEARCH_PASSWORD}'
+        ssl:
+          # for testing only
+          verification_mode: "none"
+      setup.template.name: "filebeat"
+      setup.template.pattern: "filebeat-oss-*"
+  secretMounts:
+    - name: elasticsearch-master-certs
+      secretName: elasticsearch-master-certs
+      path: /usr/share/filebeat/certs
+  resources:
+    limits:
+      # Should avoid OOM (Error 137) when running goss tests into the pod
+      memory: "300Mi"
+
